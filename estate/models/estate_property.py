@@ -24,7 +24,7 @@ class EstateProperty(models.Model):
     garden = fields.Boolean('Garden', default=True)
     
     date_availability = fields.Date('Available From', required=False, copy=False, default=fields.Date.add(fields.Date.today(), months=3))
-    garden_orientation = fields.Selection([('north', 'North'), ('south', 'South'), ('east', 'East'), ('west', 'West')])
+    garden_orientation = fields.Selection([('', ''), ('north', 'North'), ('south', 'South'), ('east', 'East'), ('west', 'West')])
     
     state = fields.Selection([('new', 'New'), ('offer received', 'Offer Received'), ('offer accepted', 'Offer Accepted'), ('sold', 'Sold'), ('canceled', 'Canceled')],
                              required=True, copy=False, default='new')
@@ -53,7 +53,19 @@ class EstateProperty(models.Model):
     def _compute_best_price(self):
         for record in self:
             list_prices = record.mapped('offer_ids.price')
-            record.best_price = max(list_prices)
+            if len(list_prices) > 0:
+                record.best_price = max(list_prices)
+            else:
+                record.best_price = 0
+            
+    @api.onchange("garden")
+    def _onchange_garden(self):
+        if(self.garden):
+            self.garden_area = 10
+            self.garden_orientation = 'north'
+        else:
+            self.garden_area = 0
+            self.garden_orientation = ''
     
     _sql_constraints = [
         ('check_expected_price', 'CHECK(expected_price >= 0)', 'The expected price can\'t be negative.'),
