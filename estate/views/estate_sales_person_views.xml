@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+
+    <!-- <record id="res_user_views_action" model="ir.actions.act_window">
+        <field name="name">Properties List</field>
+        <field name="res_model">res.user</field>
+        <field name="view_mode">form</field>
+    </record> -->
+
+    <!-- <record id="estate_sales_person_views_tree" model="ir.ui.view">
+        <field name="name">estate.sales.person.tree</field>
+        <field name="model">estate.sales.person</field>
+        <field name="arch" type="xml">
+            <tree string="Test" decoration-bf="state=='offer accepted'" decoration-muted="state=='sold'" decoration-success="state in ['offer received', 'offer accepted']">
+                <field name="name"/>
+                <field name="postcode"/>
+                <field name="bedrooms"/>
+                <field name="living_area"/>
+                <field name="expected_price"/>
+                <field name="selling_price"/>
+                <field name="date_availability" optional="hide"/>
+                <field name="state" invisible="1"/>
+            </tree>
+        </field>
+    </record> -->
+
+    <!-- <record id="res_user_form_tree" model="ir.ui.view"> -->
+        <!-- <field name="name">res.user.form</field> -->
+        <record id="res_users_view_form" model="ir.ui.view">
+        <field name="name">res.users.view.form.inherit.gamification</field>
+        <field name="model">res.users</field>
+        <field name="inherit_id" ref="base.view_users_form"/>
+        <field name="arch" type="xml">
+            <!-- <group name="messaging" position="inside">
+                <h1>testkspok</h1>
+            </group> -->
+            <xpath expr="//page[@name='preferences']" position="after">
+                    <page string="Real Estate Properties">
+                        <field name="property_ids" widget="one2many_list" />
+                    </page>
+                    
+                </xpath>
+        </field>
+    </record>
+
+    <!-- <record id="estate_property_filter" model="ir.ui.view">
+        <field name="name">estate.property.filter</field>
+        <field name="model">estate.property</field>
+        <field name="arch" type="xml">
+            <search string="Test">
+                <field name="name"/>
+                <field name="postcode"/>
+                <field name="expected_price"/>
+                <field name="bedrooms"/>
+                <field name="living_area"
+                filter_domain="[('living_area', '>=', self)]"/>
+
+                
+                <field name="facades"/>
+
+                <filter name="state" string="Available Properties" domain="['|', ('state', '=', 'new'), ('state', '=', 'offer received')]"/>
+                <filter string="Group By Postcode" name="groupby_postcode" context="{'group_by': 'postcode'}"/>
+
+            </search>
+        </field>
+    </record> -->
+
+
+</odoo>

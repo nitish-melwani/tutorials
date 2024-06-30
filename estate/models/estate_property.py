@@ -1,6 +1,6 @@
 
-from odoo import api, fields, models, exceptions
-from odoo.exceptions import ValidationError
+from odoo import api, fields, models
+from odoo.exceptions import ValidationError, UserError
 from odoo.tools.float_utils import float_compare, float_is_zero
 
 class EstateProperty(models.Model):
@@ -36,6 +36,7 @@ class EstateProperty(models.Model):
     partner_id = fields.Many2one("res.partner", string="Buyer", copy=False)
     
     user_id = fields.Many2one("res.users", string="Seller", default=lambda self: self.env.user.id)
+    # user_id = fields.Many2one("estate.sales.person", string="Seller", default=lambda self: self.env.user.id)
     
     property_tags = fields.Many2many("estate.property.tag", string="Property Tag")
     
@@ -73,7 +74,7 @@ class EstateProperty(models.Model):
         for record in self:
             print(record.state)
             if record.state == 'canceled':
-                raise exceptions.UserError("Canceled property cannot be sold")
+                raise UserError("Canceled property cannot be sold")
             else:
                 record.state = 'sold'
         return True
@@ -82,7 +83,7 @@ class EstateProperty(models.Model):
         for record in self:
             print(record.state)
             if record.state == 'sold':
-                raise exceptions.UserError("Sold property cannot be canceled")
+                raise UserError("Sold property cannot be canceled")
             else:
                 record.state = 'canceled'
         return True
@@ -96,6 +97,13 @@ class EstateProperty(models.Model):
             if float_is_zero(record.selling_price, precision_digits=2) == False:
                 if float_compare(record.selling_price, (record.expected_price * 0.9), precision_digits=2) < 0:
                     raise ValidationError("Selling price must be at least 90 % of expected price")
+                
+                
+    @api.ondelete(at_uninstall=False)
+    def _unlink_if_property_acrive(self):
+        if any(record.state in ['offer received', 'offer accepted', 'sold'] for record in self):
+            raise UserError("Can only delete a new or cancelled property!")
+    
         
         
     _sql_constraints = [

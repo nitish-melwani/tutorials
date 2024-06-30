@@ -1,4 +1,5 @@
-from odoo import api, fields, models, exceptions
+from odoo import api, fields, models
+from odoo.exceptions import UserError
 
 class EstatePropertyOffer(models.Model):
     _name = "estate.property.offer"
@@ -47,7 +48,7 @@ class EstatePropertyOffer(models.Model):
     def accept_offer(self):
         for record in self:
             if record.property_id.selling_price:
-                raise exceptions.UserError("Another offer has already been accepted")
+                raise UserError("Another offer has already been accepted")
             record.property_id.selling_price = record.price
             record.property_id.partner_id = record.partner_id
             record.status = 'accepted'
@@ -57,6 +58,16 @@ class EstatePropertyOffer(models.Model):
         for record in self:
             record.status = 'refused'
         return True
+    
+    
+    @api.model
+    def create(self, vals):
+        record = self.env['estate.property'].browse(vals['property_id'])
+        if record.best_price > vals['price']:
+            raise UserError("New offer price must be create than previous offers!")
+        record.state = 'offer received'
+        
+        return super(EstatePropertyOffer, self).create(vals)
 
     _sql_constraints = [
         ('check_offer_price', 'CHECK(price >= 0)', 'The offer price can\'t be negative.')
