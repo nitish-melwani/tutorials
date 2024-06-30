@@ -1,9 +1,9 @@
-from odoo import api, fields, models
-from datetime import datetime
+from odoo import api, fields, models, exceptions
 
 class EstatePropertyOffer(models.Model):
     _name = "estate.property.offer"
     _description = "Property Offer"
+    _order = "price desc"
     
     
     price = fields.Float()
@@ -14,6 +14,11 @@ class EstatePropertyOffer(models.Model):
     validity = fields.Integer('Validity (days)', default=7)
     date_deadline = fields.Date('Deadline', compute="_compute_date_deadline", inverse="_inverse_date_deadline", readonly=False)
     
+    # property_type_id = fields.Many2one(compute="_compute_property_type")
+    
+    # property_type_id = fields.Many2one("estate.property", related='property_id.property_type_id', inverse='offer_ids', store=True)
+    
+    
     @api.depends('validity')
     def _compute_date_deadline(self):
         for record in self:
@@ -21,6 +26,11 @@ class EstatePropertyOffer(models.Model):
                 record.date_deadline = fields.Date.add(fields.Date.to_date(record.create_date), days=record.validity)
             else:
                 record.date_deadline = fields.Date.add(fields.Date.today(), days=record.validity)
+            
+    # @api.depends('property_id.property_type_id')
+    # def _compute_property_type(self):
+    #     for record in self:
+    #         record.property_type_id = record.property_id.property_type_id
             
             
     @api.depends('date_deadline')
@@ -33,3 +43,21 @@ class EstatePropertyOffer(models.Model):
             date1 = record.date_deadline
             difference = (date1 - created_date).days
             record.validity = difference
+            
+    def accept_offer(self):
+        for record in self:
+            if record.property_id.selling_price:
+                raise exceptions.UserError("Another offer has already been accepted")
+            record.property_id.selling_price = record.price
+            record.property_id.partner_id = record.partner_id
+            record.status = 'accepted'
+        return True
+
+    def refuse_offer(self):
+        for record in self:
+            record.status = 'refused'
+        return True
+
+    _sql_constraints = [
+        ('check_offer_price', 'CHECK(price >= 0)', 'The offer price can\'t be negative.')
+    ]

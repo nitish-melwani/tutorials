@@ -1,10 +1,12 @@
 
-from odoo import api, fields, models
+from odoo import api, fields, models, exceptions
+from odoo.exceptions import ValidationError
+from odoo.tools.float_utils import float_compare, float_is_zero
 
 class EstateProperty(models.Model):
     _name = "estate.property"
     _description = "Estate Properties"
-    # _order = "sequence"
+    _order = "id desc"
     
     
     active = fields.Boolean('Active', default=False)
@@ -29,7 +31,7 @@ class EstateProperty(models.Model):
     state = fields.Selection([('new', 'New'), ('offer received', 'Offer Received'), ('offer accepted', 'Offer Accepted'), ('sold', 'Sold'), ('canceled', 'Canceled')],
                              required=True, copy=False, default='new')
     
-    property_type_id = fields.Many2one("estate.property.type", string="Property Type")
+    property_type_id = fields.Many2one("estate_property_type", string="Property Type")
     
     partner_id = fields.Many2one("res.partner", string="Buyer", copy=False)
     
@@ -66,7 +68,37 @@ class EstateProperty(models.Model):
         else:
             self.garden_area = 0
             self.garden_orientation = ''
+            
+    def property_sold(self):
+        for record in self:
+            print(record.state)
+            if record.state == 'canceled':
+                raise exceptions.UserError("Canceled property cannot be sold")
+            else:
+                record.state = 'sold'
+        return True
+
+    def property_canceled(self):
+        for record in self:
+            print(record.state)
+            if record.state == 'sold':
+                raise exceptions.UserError("Sold property cannot be canceled")
+            else:
+                record.state = 'canceled'
+        return True
     
+    
+    @api.constrains('expected_price', 'selling_price')
+    def _check_price(self):
+        for record in self:
+            print(record.selling_price)
+            print(record.expected_price)
+            if float_is_zero(record.selling_price, precision_digits=2) == False:
+                if float_compare(record.selling_price, (record.expected_price * 0.9), precision_digits=2) < 0:
+                    raise ValidationError("Selling price must be at least 90 % of expected price")
+        
+        
     _sql_constraints = [
         ('check_expected_price', 'CHECK(expected_price >= 0)', 'The expected price can\'t be negative.'),
+        ('check_selling_price', 'CHECK(selling_price >= 0 OR selling_price is Null)', 'The selling price can\'t be negative.'),
     ]
