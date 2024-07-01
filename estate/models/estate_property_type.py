@@ -1,14 +1,14 @@
 from odoo import fields, models, api
 
 class EstatePropertyType(models.Model):
-    _name = "estate_property_type"
+    _name = "estate.property.type"
     _description = "Estate Property Types"
     _order = "sequence, name"
     
     name = fields.Char('Type', required=True)
     sequence = fields.Integer('Sequence', default=1, help="Used to order stages. Lower is better.")
     
-    property_ids = fields.One2many("estate.property", "property_type_id")
+    property_ids = fields.One2many("estate_property", "property_type_id")
     
     # offer_ids = fields.One2many(compute="_compute_property_type")
     # offer_ids = fields.One2many(related='property_ids.offer_ids', store=True)

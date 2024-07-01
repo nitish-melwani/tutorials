@@ -4,7 +4,7 @@ from odoo.exceptions import ValidationError, UserError
 from odoo.tools.float_utils import float_compare, float_is_zero
 
 class EstateProperty(models.Model):
-    _name = "estate.property"
+    _name = "estate_property"
     _description = "Estate Properties"
     _order = "id desc"
     
@@ -31,7 +31,7 @@ class EstateProperty(models.Model):
     state = fields.Selection([('new', 'New'), ('offer received', 'Offer Received'), ('offer accepted', 'Offer Accepted'), ('sold', 'Sold'), ('canceled', 'Canceled')],
                              required=True, copy=False, default='new')
     
-    property_type_id = fields.Many2one("estate_property_type", string="Property Type")
+    property_type_id = fields.Many2one("estate.property.type", string="Property Type")
     
     partner_id = fields.Many2one("res.partner", string="Buyer", copy=False)
     
