@@ -9,7 +9,7 @@ class EstatePropertyOffer(models.Model):
     
     price = fields.Float()
     status = fields.Selection([('accepted', 'Accepted'), ('refused', 'Refused')], copy=False)
-    property_id = fields.Many2one("estate_property", string="Property", required=True)
+    property_id = fields.Many2one("estate.property", string="Property", required=True)
     partner_id = fields.Many2one("res.partner", string="Buyer", required=True)
 
     validity = fields.Integer('Validity (days)', default=7)
@@ -62,7 +62,7 @@ class EstatePropertyOffer(models.Model):
     
     @api.model
     def create(self, vals):
-        record = self.env['estate_property'].browse(vals['property_id'])
+        record = self.env['estate.property'].browse(vals['property_id'])
         if record.best_price > vals['price']:
             raise UserError("New offer price must be create than previous offers!")
         record.state = 'offer received'
