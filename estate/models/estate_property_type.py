@@ -11,15 +11,17 @@ class EstatePropertyType(models.Model):
     property_ids = fields.One2many("estate.property", "property_type_id")
     
     # offer_ids = fields.One2many(compute="_compute_property_type")
-    # offer_ids = fields.One2many(related='property_ids.offer_ids', store=True)
+    # offer_ids = fields.One2many(related='property_ids.offer_ids', inverse="property_type_id.offer_ids", store=True)
+    offer_ids = fields.One2many('estate.property.offer', 'property_type_id', store=True)
+
     
     
-    # offer_count = fields.Integer(compute="_compute_offer_count")
+    offer_count = fields.Integer(compute="_compute_offer_count")
     
-    # @api.depends('property_ids.property_type_id')
-    # def _compute_property_type(self):
-    #     for record in self:
-    #         record.offer_ids = record.property_ids.property_type_id
+    @api.depends('property_ids.property_type_id')
+    def _compute_property_type(self):
+        for record in self:
+            record.offer_ids = record.property_ids.property_type_id
             
     @api.depends('offer_ids')
     def _compute_offer_count(self):

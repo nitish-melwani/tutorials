@@ -9,7 +9,7 @@ class EstateProperty(models.Model):
     _order = "id desc"
     
     
-    active = fields.Boolean('Active', default=False)
+    active = fields.Boolean('Active', default=True)
     
     name = fields.Char('Title', required=True)
     description = fields.Text('Description', required=True)
@@ -41,7 +41,7 @@ class EstateProperty(models.Model):
     property_tags = fields.Many2many("estate.property.tag", string="Property Tag")
     
     offer_ids =  fields.One2many("estate.property.offer", "property_id")
-    
+    # property_type_id
     total_area = fields.Integer('Total Area (sqm)', compute="_compute_total_area")
     
     best_price = fields.Float('Best Offer', compute="_compute_best_price")

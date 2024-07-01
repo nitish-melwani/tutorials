@@ -16,9 +16,9 @@ class EstatePropertyOffer(models.Model):
     date_deadline = fields.Date('Deadline', compute="_compute_date_deadline", inverse="_inverse_date_deadline", readonly=False)
     
     # property_type_id = fields.Many2one(compute="_compute_property_type")
-    
+     
     # property_type_id = fields.Many2one("estate.property", related='property_id.property_type_id', inverse='offer_ids', store=True)
-    
+    property_type_id = fields.Many2one("estate.property", related='property_id.property_type_id', store=True)
     
     @api.depends('validity')
     def _compute_date_deadline(self):
@@ -65,7 +65,9 @@ class EstatePropertyOffer(models.Model):
     def create(self, vals):
         record = self.env['estate.property'].browse(vals['property_id'])
         if record.best_price > vals['price']:
-            raise UserError("New offer price must be create than previous offers!")
+            raise UserError("New offer price must be greater than previous offers!")
+        if record.expected_price * 0.9 > self.price:
+            raise UserError("New offer price must be at least 90% of expected offer price!")
         record.state = 'offer received'
         
         return super(EstatePropertyOffer, self).create(vals)

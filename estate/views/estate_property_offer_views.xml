@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <record id="estate_tags_offer_action" model="ir.actions.act_window">
-        <field name="name">Property Tags</field>
+    <record id="estate_property_offer_views_action" model="ir.actions.act_window">
+        <field name="name">Property Offers</field>
         <field name="res_model">estate.property.offer</field>
         <field name="view_mode">tree,form</field>
     </record>

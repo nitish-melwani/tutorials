@@ -7,6 +7,16 @@
         <field name="view_mode">tree,form</field>
     </record>
 
+    <!-- <record id="estate_property_offer_action" model="ir.actions.act_window">
+        <field name="name">Property Types</field>
+        <field name="res_model">estate.property.offer</field>
+        <field name="view_mode">tree,form</field>
+        <field name="help" type="html">
+            <p class="o_view_nocontent_smiling_face">Create the first cash rounding</p>
+        </field>
+    </record> -->
+
+
 
     <record id="estate_property_type_form_tree" model="ir.ui.view">
         <field name="name">estate.property.type.form</field>
@@ -16,6 +26,8 @@
                 <sheet>
                 <header>
                     <!-- <button type="action" name="estate.property.offer" string="Go to"/> -->
+                    <!-- <button type="action" name="%(estate.estate_property_offer_action)d"/> -->
+                    <button type="action" name="estate_property_offer_views_action"/>
                     <!-- offer_count -->
                 </header>
                     <h1><field name="name"/></h1>
